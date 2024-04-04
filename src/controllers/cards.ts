@@ -1,7 +1,7 @@
 import { Response } from 'express';
 import Card from '../models/cards';
 import { IRequest } from '../types';
-import { REQUEST_SUCCESS, VALIDATION_ERROR, SERVER_ERROR, DATA_NOT_FOUND } from '../constants';
+import { REQUEST_SUCCESS, VALIDATION_ERROR, SERVER_ERROR, DATA_NOT_FOUND, AUTH_SUCCESS } from '../constants';
 
 export const createCard = (req: IRequest, res: Response) => {
   const { name, link } = req.body;
@@ -10,7 +10,7 @@ export const createCard = (req: IRequest, res: Response) => {
     link,
     owner: req.user?._id,
   })
-    .then((card) => res.status(REQUEST_SUCCESS).send(card))
+    .then((card) => res.status(AUTH_SUCCESS).send(card))
     .catch((error) => {
       if (error.name === 'ValidationError') {
         return res.status(VALIDATION_ERROR).send({ message: 'Переданы некорректные данные при создании карточки' });
@@ -20,7 +20,7 @@ export const createCard = (req: IRequest, res: Response) => {
 };
 
 export const getCards = (req: IRequest, res: Response) => {
-  Card.find({})
+  Card.find({}).orFail(new Error('No cards found!'))
     .then((cards) => res.status(REQUEST_SUCCESS).send({ data: cards }))
     .catch((error) => res.status(SERVER_ERROR).send({ message: `${error}:Ошибка на сервере` }));
 };
@@ -34,7 +34,7 @@ export const deleteCard = (req: IRequest, res: Response) => {
       return res.send({ data: card });
     })
     .catch((error) => {
-      if (error.name === 'ValidationError' || error.name === 'CastError') {
+      if (error.name === 'CastError') {
         return res.status(VALIDATION_ERROR).send({ message: 'Переданы некорректные при удалении карточки' });
       }
       return res.status(SERVER_ERROR).send({ message: 'Ошибка на сервере' });
@@ -54,7 +54,7 @@ export const likeCard = (req: IRequest, res: Response) => {
       return res.send({ data: card });
     })
     .catch((error) => {
-      if (error.name === 'ValidationError' || error.name === 'CastError') {
+      if (error.name === 'CastError') {
         return res.status(VALIDATION_ERROR).send({ message: 'Переданы некорректные данные для постановки лайка' });
       }
       return res.status(SERVER_ERROR).send({ message: 'Ошибка на сервере' });
@@ -74,7 +74,7 @@ export const dislikeCard = (req: IRequest, res: Response) => {
       return res.send({ data: card });
     })
     .catch((error) => {
-      if (error.name === 'ValidationError' || error.name === 'CastError') {
+      if (error.name === 'CastError') {
         return res.status(VALIDATION_ERROR).send({ message: 'Переданы некорректные данные для снятия лайка' });
       }
       return res.status(SERVER_ERROR).send({ message: 'Ошибка на сервере' });

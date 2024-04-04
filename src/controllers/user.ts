@@ -20,7 +20,7 @@ export const createUser = (req: IRequest, res: Response) => {
 };
 
 export const getUsers = (req: IRequest, res: Response) => {
-  User.find({})
+  User.find({}).orFail(new Error('No one user found!'))
     .then((user) => res.status(REQUEST_SUCCESS).send({ data: user }))
     .catch((error) => res.status(SERVER_ERROR).send({ message: `Произошла ошибка: ${error}` }));
 };
@@ -32,7 +32,7 @@ export const getUserById = (req: IRequest, res: Response) => {
       return res.status(REQUEST_SUCCESS).send({ data: user });
     })
     .catch((error) => {
-      if (error.name === 'ValidationError' || error.name === 'CastError') {
+      if (error.name === 'CastError') {
         return res.status(VALIDATION_ERROR).send({ message: 'Переданы некорректные данные при удалении карточки' });
       }
       return res.status(SERVER_ERROR).send({ message: 'Произошла ошибка' });
@@ -47,7 +47,7 @@ export const updateUser = (req: IRequest, res: Response) => {
       return res.status(REQUEST_SUCCESS).send({ data: user });
     })
     .catch((error) => {
-      if (error.name === 'ValidationError' || error.name === 'CastError') {
+      if (error.name === 'ValidationError') {
         return res.status(VALIDATION_ERROR).send({ message: 'Переданы некорректные при обновлении профиля' });
       }
       return res.status(SERVER_ERROR).send({ message: 'Ошибка на сервере' });
