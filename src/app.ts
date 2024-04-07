@@ -1,10 +1,14 @@
-import express, { Response } from 'express';
+import express, { Application } from 'express';
 import mongoose from 'mongoose';
+import { errors } from 'celebrate';
+import auth from './middlewares/auth';
 import { MONGO_URL, PORT } from './constants';
 import routes from './routes/index';
-import { IRequest } from './types';
+import { createUser, login } from './controllers/user';
+import { loggerError, loggerRequest } from './middlewares/logger';
+import { validateCreateUser, validateLogin } from './validator/validator';
 
-const app = express();
+const app: Application = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -16,13 +20,14 @@ mongoose
   .catch((error) => {
     console.error('Ошибка подключения к MongoDB:', error);
   });
-app.use((req: IRequest, res: Response, next) => {
-  req.user = { _id: '660c07c89d367ffcde1d08b0' };
 
-  next();
-});
+app.use(loggerRequest);
+app.use(loggerError);
+app.post('/signin', validateLogin, login);
+app.post('/signup', validateCreateUser, createUser);
+app.use(auth);
 app.use(routes);
-
+app.use(errors());
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
 });
