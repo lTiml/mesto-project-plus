@@ -4,5 +4,6 @@ export const REQUEST_SUCCESS = 200;
 export const AUTH_SUCCESS = 201;
 export const VALIDATION_ERROR = 400;
 export const ACCESS_ERROR = 403;
+export const AUTH_ERROR = 401;
 export const DATA_NOT_FOUND = 404;
 export const SERVER_ERROR = 500;
