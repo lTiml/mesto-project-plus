@@ -22,13 +22,14 @@ export const createCard = (req: IRequest, res: Response, next: NextFunction) => 
 };
 
 export const getCards = (req: IRequest, res: Response, next: NextFunction) => {
-  Card.find({}).orFail(new Error('No cards found!'))
+  Card.find({})
     .then((cards) => res.status(REQUEST_SUCCESS).send({ data: cards }))
     .catch(next);
 };
 
 export const deleteCard = (req: IRequest, res: Response, next: NextFunction) => {
   Card.findByIdAndDelete(req.params.cardId)
+    .orFail(new NotFoundError('Карточка с таким id не найдена'))
     .then((card) => {
       if (!card) {
         return next(new NotFoundError('Карточка пользователя не найдена'));
@@ -49,6 +50,7 @@ export const likeCard = (req: IRequest, res: Response, next: NextFunction) => {
     { $addToSet: { likes: req.user?._id } },
     { new: true },
   )
+    .orFail(new NotFoundError('Карточка с таким id не найдена'))
     .then((card) => {
       if (!card) {
         return next(new NotFoundError('Карточка пользователя не найдена'));
@@ -59,7 +61,7 @@ export const likeCard = (req: IRequest, res: Response, next: NextFunction) => {
       if (error.name === 'CastError') {
         return next(new ValidationError('Переданы некорректные данные для постановки лайка'));
       }
-      next();
+      next(error);
     });
 };
 
@@ -69,6 +71,7 @@ export const dislikeCard = (req: IRequest, res: Response, next: NextFunction) =>
     { $pull: { likes: req.user?._id } },
     { new: true },
   )
+    .orFail(new NotFoundError('Карточка с таким id не найдена'))
     .then((card) => {
       if (!card) {
         return next(new NotFoundError('Карточка пользователя не найдена'));
@@ -79,6 +82,6 @@ export const dislikeCard = (req: IRequest, res: Response, next: NextFunction) =>
       if (error.name === 'CastError') {
         return next(new ValidationError('Переданы некорректные данные для снятия лайка'));
       }
-      next();
+      next(error);
     });
 };
