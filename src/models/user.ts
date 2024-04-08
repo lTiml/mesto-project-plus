@@ -1,6 +1,7 @@
 import { model, Schema, Document, Model } from 'mongoose';
 import validator from 'validator';
 import bcrypt from 'bcrypt';
+import NotAuthError from '../errors/NotAuthError';
 
 export interface IUser {
   name: string;
@@ -53,6 +54,8 @@ const userSchema = new Schema<IUser>({
   password: {
     type: String,
     required: true,
+    minlength: 3,
+    select: false,
   },
 });
 
@@ -65,11 +68,11 @@ userSchema.static(
     return this.findOne({ email }).select('+password')
       .then((user: IUser | null) => {
         if (!user) {
-          return Promise.reject(new Error('Неверная почта'));
+          return Promise.reject(new NotAuthError('Неверная почта или пароль'));
         }
         return bcrypt.compare(password, user.password).then((matched) => {
           if (!matched) {
-            return Promise.reject(new Error('Неправильный пароль'));
+            return Promise.reject(new NotAuthError('Неправильный пароль или пароль'));
           }
           return user;
         });
