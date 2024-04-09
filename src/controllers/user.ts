@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from '../models/user';
 import { IRequest } from '../types';
-import { REQUEST_SUCCESS, VALIDATION_ERROR, DATA_NOT_FOUND, SERVER_ERROR } from '../constants';
+import { REQUEST_SUCCESS } from '../constants';
 import ValidationError from '../errors/ValidationError';
 import ForbiddenError from '../errors/ForbiddenError';
 import NotFoundError from '../errors/NotFoundError';
@@ -84,8 +84,6 @@ export const login = async (req: IRequest, res: Response, next: NextFunction) =>
     res.status(REQUEST_SUCCESS).send({ message: 'Токен отправлен в cookie' });
   } catch (error) {
     if (error instanceof NotAuthError) {
-      next(new NotAuthError('Неправильная почта или пароль'));
-    } else {
       next(error);
     }
   }

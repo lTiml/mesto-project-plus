@@ -7,7 +7,7 @@ export const validateCreateUser = celebrate({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(200),
     email: Joi.string().email().required(),
-    avatar: Joi.string().pattern(avatar).required(),
+    avatar: Joi.string().pattern(avatar),
     password: Joi.string().required(),
   }),
 });

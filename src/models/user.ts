@@ -55,6 +55,7 @@ const userSchema = new Schema<IUser>({
     type: String,
     required: true,
     minlength: 3,
+    maxlength: 30,
     select: false,
   },
 });
