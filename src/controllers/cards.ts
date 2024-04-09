@@ -17,7 +17,7 @@ export const createCard = (req: IRequest, res: Response, next: NextFunction) => 
       if (error.name === 'ValidationError') {
         return next(new ValidationError('Переданы некорректные данные при создании карточки'));
       }
-      next();
+      next(error);
     });
 };
 
