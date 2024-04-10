@@ -7,6 +7,7 @@ import routes from './routes/index';
 import { createUser, login } from './controllers/user';
 import { loggerError, loggerRequest } from './middlewares/logger';
 import { validateCreateUser, validateLogin } from './validator/validator';
+import errorHandler from './middlewares/error-handler';
 
 const app: Application = express();
 app.use(express.json());
@@ -23,11 +24,15 @@ mongoose
 
 app.use(loggerRequest);
 app.use(loggerError);
+
 app.post('/signin', validateLogin, login);
 app.post('/signup', validateCreateUser, createUser);
+
 app.use(auth);
 app.use(routes);
+
 app.use(errors());
+app.use(errorHandler);
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
 });
