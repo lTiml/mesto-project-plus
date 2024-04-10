@@ -7,7 +7,6 @@ import { REQUEST_SUCCESS } from '../constants';
 import ValidationError from '../errors/ValidationError';
 import ForbiddenError from '../errors/ForbiddenError';
 import NotFoundError from '../errors/NotFoundError';
-import NotAuthError from '../errors/NotAuthError';
 
 export const createUser = (req: IRequest, res: Response, next: NextFunction) => {
   const { name, about, avatar, email, password } = req.body;
@@ -83,9 +82,7 @@ export const login = async (req: IRequest, res: Response, next: NextFunction) =>
     res.cookie('jwt', token, { httpOnly: true });
     res.status(REQUEST_SUCCESS).send({ message: 'Токен отправлен в cookie' });
   } catch (error) {
-    if (error instanceof NotAuthError) {
-      next(error);
-    }
+    next(error);
   }
 };
 
